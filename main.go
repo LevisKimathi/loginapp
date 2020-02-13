@@ -29,6 +29,7 @@ func dbConn() (db *sql.DB) {
 }
 
 var (
+	// Encrypt cookies using a key
 	key   = []byte("leviskimathi")
 	store = sessions.NewCookieStore(key)
 )
@@ -59,10 +60,10 @@ func newServer(options ...func(*server)) *server {
 }
 
 func (s *server) index(w http.ResponseWriter, r *http.Request) {
-	//Get session
+	// Get session
 	session, _ := store.Get(r, "cookie-name")
 
-	//Create template from html file
+	// Create template from html file
 	tmpl := template.Must(template.ParseFiles("index.html"))
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
@@ -84,6 +85,7 @@ func (s *server) index(w http.ResponseWriter, r *http.Request) {
 					panic(err.Error())
 				}
 
+				// Match hash in db with current hash
 				pwdMatch := comparePasswords(hash, []byte(password))
 
 				if pwdMatch {
@@ -105,16 +107,16 @@ func (s *server) index(w http.ResponseWriter, r *http.Request) {
 
 		_ = tmpl.Execute(w, nil)
 	} else {
-		//Redirect to dashboard
+		// Redirect to dashboard
 		http.Redirect(w, r, "/dashboard", 301)
 	}
 }
 
 func (s *server) register(w http.ResponseWriter, r *http.Request) {
-	//Get session
+	// Get session
 	session, _ := store.Get(r, "cookie-name")
 
-	//Create template from html file
+	// Create template from html file
 	tmpl := template.Must(template.ParseFiles("register.html"))
 
 	// Check if user is authenticated
@@ -131,7 +133,9 @@ func (s *server) register(w http.ResponseWriter, r *http.Request) {
 			email := r.FormValue("email")
 			phone := r.FormValue("phone")
 			password := r.FormValue("password")
+			// Hash the password
 			hash := hashAndSalt([]byte(password))
+			// Insert data into table
 			_, _ = insForm.Exec(username, email, phone, hash)
 
 			log.Println("INSERTED")
@@ -143,16 +147,16 @@ func (s *server) register(w http.ResponseWriter, r *http.Request) {
 		}
 		_ = tmpl.Execute(w, nil)
 	} else {
-		//Redirect to dashboard
+		// Redirect to dashboard
 		http.Redirect(w, r, "/dashboard", 301)
 	}
 }
 
 func (s *server) reset(w http.ResponseWriter, r *http.Request) {
-	//Get session
+	// Get session
 	session, _ := store.Get(r, "cookie-name")
 
-	//Create template from html file
+	// Create template from html file
 	tmpl := template.Must(template.ParseFiles("reset.html"))
 
 	// Check if user is authenticated
@@ -162,16 +166,16 @@ func (s *server) reset(w http.ResponseWriter, r *http.Request) {
 		}
 		_ = tmpl.Execute(w, nil)
 	} else {
-		//Redirect to dashboard
+		// Redirect to dashboard
 		http.Redirect(w, r, "/dashboard", 301)
 	}
 }
 
 func (s *server) dashboard(w http.ResponseWriter, r *http.Request) {
-	//Get session
+	// Get session
 	session, _ := store.Get(r, "cookie-name")
 
-	//Create template from html file
+	// Create template from html file
 	tmpl := template.Must(template.ParseFiles("dashboard.html"))
 
 	// Check if user is authenticated
@@ -188,38 +192,34 @@ func (s *server) dashboard(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) logout(w http.ResponseWriter, r *http.Request) {
-	//Get session
+	// Get session
 	session, _ := store.Get(r, "cookie-name")
 
-	//Delete all sessions
+	// Delete all sessions
 	session.Options.MaxAge = -1
 	// Revoke users authentication
 	session.Values["authenticated"] = false
 	_ = session.Save(r, w)
 
-	//Redirect to default endpoint
+	// Redirect to default endpoint
 	http.Redirect(w, r, "/", 301)
 }
 
 func hashAndSalt(pwd []byte) string {
 
 	// Use GenerateFromPassword to hash & salt pwd.
-	// MinCost is just an integer constant provided by the bcrypt
-	// package along with DefaultCost & MaxCost.
-	// The cost can be any value you want provided it isn't lower
-	// than the MinCost (4)
+	// MinCost is just an integer constant provided by the bcrypt package along with DefaultCost & MaxCost.
+	// The cost can be any value you want provided it isn't lower than the MinCost (4)
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
 		log.Println(err)
 	}
-	// GenerateFromPassword returns a byte slice so we need to
-	// convert the bytes to a string and return it
+	// GenerateFromPassword returns a byte slice so we need to convert the bytes to a string and return it
 	return string(hash)
 }
 
 func comparePasswords(hashedPwd string, plainPwd []byte) bool {
-	// Since we'll be getting the hashed password from the DB it
-	// will be a string so we'll need to convert it to a byte slice
+	// Since we'll be getting the hashed password from the DB it will be a string so we'll need to convert it to a byte slice
 	byteHash := []byte(hashedPwd)
 	err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
 	if err != nil {
