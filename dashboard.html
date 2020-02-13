@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login App</title>
+</head>
+<body>
+<div style="margin: auto; max-width: 300px; margin-top: 10%">
+    {{if .Success}}
+        <p>Welcome</p><p>Status : Logged In</p>
+    {{else}}
+        <script>
+            window.location.href = "http://127.0.0.1:8000/";
+        </script>
+    {{end}}
+</div>
+</body>
+</html>
