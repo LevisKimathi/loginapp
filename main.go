@@ -20,6 +20,7 @@ func dbConn() (db *sql.DB) {
 	dbUser := "root"
 	dbPass := ""
 	dbName := "goproject"
+	//Create a new mysql db connection
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
 	if err != nil {
 		panic(err.Error())
@@ -58,8 +59,10 @@ func newServer(options ...func(*server)) *server {
 }
 
 func (s *server) index(w http.ResponseWriter, r *http.Request) {
+	//Get session
 	session, _ := store.Get(r, "cookie-name")
 
+	//Create template from html file
 	tmpl := template.Must(template.ParseFiles("index.html"))
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
@@ -92,13 +95,16 @@ func (s *server) index(w http.ResponseWriter, r *http.Request) {
 
 		_ = tmpl.Execute(w, nil)
 	} else {
+		//Redirect to dashboard
 		http.Redirect(w, r, "/dashboard", 301)
 	}
 }
 
 func (s *server) register(w http.ResponseWriter, r *http.Request) {
+	//Get session
 	session, _ := store.Get(r, "cookie-name")
 
+	//Create template from html file
 	tmpl := template.Must(template.ParseFiles("register.html"))
 
 	// Check if user is authenticated
@@ -127,6 +133,7 @@ func (s *server) register(w http.ResponseWriter, r *http.Request) {
 		}
 		_ = tmpl.Execute(w, nil)
 	} else {
+		//Redirect to dashboard
 		http.Redirect(w, r, "/dashboard", 301)
 	}
 }
@@ -135,6 +142,7 @@ func (s *server) reset(w http.ResponseWriter, r *http.Request) {
 	//Get session
 	session, _ := store.Get(r, "cookie-name")
 
+	//Create template from html file
 	tmpl := template.Must(template.ParseFiles("reset.html"))
 
 	// Check if user is authenticated
@@ -144,6 +152,7 @@ func (s *server) reset(w http.ResponseWriter, r *http.Request) {
 		}
 		_ = tmpl.Execute(w, nil)
 	} else {
+		//Redirect to dashboard
 		http.Redirect(w, r, "/dashboard", 301)
 	}
 }
@@ -152,6 +161,7 @@ func (s *server) dashboard(w http.ResponseWriter, r *http.Request) {
 	//Get session
 	session, _ := store.Get(r, "cookie-name")
 
+	//Create template from html file
 	tmpl := template.Must(template.ParseFiles("dashboard.html"))
 
 	// Check if user is authenticated
@@ -175,6 +185,7 @@ func (s *server) logout(w http.ResponseWriter, r *http.Request) {
 	session.Values["authenticated"] = false
 	_ = session.Save(r, w)
 
+	//Redirect to default endpoint
 	http.Redirect(w, r, "/", 301)
 }
 
