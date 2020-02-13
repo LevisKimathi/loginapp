@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/sessions"
+	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"log"
 	"net/http"
@@ -66,24 +67,34 @@ func (s *server) index(w http.ResponseWriter, r *http.Request) {
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 		if r.Method == http.MethodPost {
+			password := r.FormValue("password")
+
 			db := dbConn()
-			selDB, err := db.Query("SELECT * FROM users WHERE username = ? AND password = ? ", r.FormValue("username"), r.FormValue("password"))
+			selDB, err := db.Query("SELECT * FROM users WHERE username = ?", r.FormValue("username"))
 			if err != nil {
 				panic(err.Error())
 			}
 
 			for selDB.Next() {
 				var id int
-				var username, email, phone, password string
-				err = selDB.Scan(&id, &username, &email, &phone, &password)
-				// Set user as authenticated
-				session.Values["authenticated"] = true
-				session.Values["username"] = username
-				_ = session.Save(r, w)
-				http.Redirect(w, r, "/dashboard", 301)
+				var username, email, phone, hash string
+				err = selDB.Scan(&id, &username, &email, &phone, &hash)
+
 				if err != nil {
 					panic(err.Error())
 				}
+
+				pwdMatch := comparePasswords(hash, []byte(password))
+
+				if pwdMatch {
+					// Set user as authenticated
+					session.Values["authenticated"] = true
+					session.Values["username"] = username
+					_ = session.Save(r, w)
+					http.Redirect(w, r, "/dashboard", 301)
+
+				}
+
 			}
 
 			log.Println("SELECTED")
@@ -120,8 +131,8 @@ func (s *server) register(w http.ResponseWriter, r *http.Request) {
 			email := r.FormValue("email")
 			phone := r.FormValue("phone")
 			password := r.FormValue("password")
-
-			_, _ = insForm.Exec(username, email, phone, password)
+			hash := hashAndSalt([]byte(password))
+			_, _ = insForm.Exec(username, email, phone, hash)
 
 			log.Println("INSERTED")
 
@@ -186,6 +197,34 @@ func (s *server) logout(w http.ResponseWriter, r *http.Request) {
 
 	//Redirect to default endpoint
 	http.Redirect(w, r, "/", 301)
+}
+
+func hashAndSalt(pwd []byte) string {
+
+	// Use GenerateFromPassword to hash & salt pwd.
+	// MinCost is just an integer constant provided by the bcrypt
+	// package along with DefaultCost & MaxCost.
+	// The cost can be any value you want provided it isn't lower
+	// than the MinCost (4)
+	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+	if err != nil {
+		log.Println(err)
+	} // GenerateFromPassword returns a byte slice so we need to
+	// convert the bytes to a string and return it
+	return string(hash)
+}
+
+func comparePasswords(hashedPwd string, plainPwd []byte) bool {
+	// Since we'll be getting the hashed password from the DB it
+	// will be a string so we'll need to convert it to a byte slice
+	byteHash := []byte(hashedPwd)
+	err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
