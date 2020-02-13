@@ -191,6 +191,8 @@ func (s *server) logout(w http.ResponseWriter, r *http.Request) {
 	//Get session
 	session, _ := store.Get(r, "cookie-name")
 
+	//Delete all sessions
+	session.Options.MaxAge = -1
 	// Revoke users authentication
 	session.Values["authenticated"] = false
 	_ = session.Save(r, w)
@@ -209,7 +211,8 @@ func hashAndSalt(pwd []byte) string {
 	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
 	if err != nil {
 		log.Println(err)
-	} // GenerateFromPassword returns a byte slice so we need to
+	}
+	// GenerateFromPassword returns a byte slice so we need to
 	// convert the bytes to a string and return it
 	return string(hash)
 }
