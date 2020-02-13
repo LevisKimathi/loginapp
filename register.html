@@ -5,38 +5,37 @@
     <title>Login App</title>
 </head>
 <body>
-<div style="margin: auto;max-width: 300px; margin-top: 10%">
-    <form id="registerform" method="POST" >
+<div style="max-width: 300px; margin: 10% auto auto;">
+    <form id="register_form" method="POST" >
         <label for="username">Username</label><br>
-        <input type="text" placeholder="username" name="username"><br>
+        <input type="text" placeholder="username" name="username" id="username"><br>
         <label for="email">Email</label><br>
-        <input type="text" placeholder="email" name="email"><br>
+        <input type="text" placeholder="email" name="email" id="email"><br>
         <label for="phone">Phone</label><br>
-        <input type="text" placeholder="phone" name="phone"><br>
+        <input type="text" placeholder="phone" name="phone" id="phone"><br>
         <label for="password">Password</label><br>
-        <input type="password" placeholder="password" name="password"><br>
+        <input type="password" placeholder="password" name="password" id="password"><br>
         <label for="confirm password">Confirm Password</label><br>
-        <input type="password" placeholder="confirm password" name="confirm password"><br>
+        <input type="password" placeholder="confirm password" name="confirm password" id="confirm password"><br>
     </form>
 
-    <button onclick="validateForm()">Submit</button>
+    <button onclick="validateForm()">SUBMIT</button>
 
-    <p>Forgot password? <a href="http://127.0.0.1:8000/reset/">Reset Here</a></p>
-    <p>Already a member? <a href="http://127.0.0.1:8000/">Sign Up Now</a></p>
+    <p>Already a member? <a href="http://127.0.0.1:8000/">Sign In Now</a></p>
 </div>
 
 <script>
     function validateForm() {
-        var username = document.forms["registerform"]["username"].value;
-        var email = document.forms["registerform"]["email"].value;
-        var phone = document.forms["registerform"]["phone"].value;
-        var password = document.forms["registerform"]["password"].value;
-        var confirmpassword = document.forms["registerform"]["confirm password"].value;
-        if(username!=""||email!=""||phone!=""||password!=""||confirmpassword!=""){
+        let username = document.forms["register_form"]["username"].value;
+        let email = document.forms["register_form"]["email"].value;
+        let phone = document.forms["register_form"]["phone"].value;
+        let password = document.forms["register_form"]["password"].value;
+        let confirm_password = document.forms["register_form"]["confirm password"].value;
+        if(username!=="" || email!=="" || phone!=="" || password!=="" || confirm_password!==""){
             if (ValidateEmail(email)) {
                 if(ValidatePhone(phone)){
-                    if(ValidatePassword(password,confirmpassword)){
-                        document.getElementById("registerform").submit();
+                    if(ValidatePassword(password,confirm_password)){
+                        document.getElementById("register_form").submit();
                     }
                 }
             }
@@ -46,17 +45,23 @@
         }
     }
 
+    /**
+     * @return {boolean}
+     */
     function ValidateEmail(email) {
-        if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+        if (/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
             return true;
         }
         alert("You have entered an invalid email address!");
         return false;
     }
 
+    /**
+     * @return {boolean}
+     */
     function ValidatePhone(phone) {
-        var phonenopattern = /^\(?([0-9]{3})\)?[]?([0-9]{3})[]?([0-9]{4})$/;
-        if(phone.match(phonenopattern)) {
+        let phone_no_pattern = /^\(?([0-9]{3})\)?[]?([0-9]{3})[]?([0-9]{4})$/;
+        if(phone.match(phone_no_pattern)) {
             return true;
         } else {
             alert("You have entered an invalid phone number!");
@@ -64,16 +69,19 @@
         }
     }
 
-    function ValidatePassword(password,confirmpassword) {
+    /**
+     * @return {boolean}
+     */
+    function ValidatePassword(password,confirm_password) {
        if(password.length>=5){
-           if(password.match(confirmpassword)) {
+           if(password.match(confirm_password)) {
                return true;
            }else{
-               alert("Your passwords don't match!")
+               alert("Your passwords don't match!");
                return false;
            }
        }else {
-           alert("Your password is too short! Password should be more than 5 characters")
+           alert("Your password is too short! Password should be more than 5 characters");
            return false;
        }
 

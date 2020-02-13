@@ -5,13 +5,9 @@
     <title>Login App</title>
 </head>
 <body>
-<div style="margin: auto; max-width: 300px; margin-top: 10%">
+<div style="max-width: 500px; margin: 10% auto auto;">
     {{if .Success}}
-        <p>Welcome</p><p>Status : Logged In</p>
-    {{else}}
-        <script>
-            window.location.href = "http://127.0.0.1:8000/";
-        </script>
+        <p>Welcome {{.Username}} Status : Logged In <a href="http://127.0.0.1:8000/dashboard/logout">Logout</a></p>
     {{end}}
 </div>
 </body>

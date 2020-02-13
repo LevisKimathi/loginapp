@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/sessions"
+	_ "github.com/gorilla/sessions"
 	"html/template"
 	"log"
 	"net/http"
@@ -25,6 +27,11 @@ func dbConn() (db *sql.DB) {
 	return db
 }
 
+var (
+	key   = []byte("leviskimathi")
+	store = sessions.NewCookieStore(key)
+)
+
 type server struct {
 	logger *log.Logger
 	mux    *http.ServeMux
@@ -45,75 +52,130 @@ func newServer(options ...func(*server)) *server {
 	s.mux.HandleFunc("/register/", s.register)
 	s.mux.HandleFunc("/reset/", s.reset)
 	s.mux.HandleFunc("/dashboard/", s.dashboard)
+	s.mux.HandleFunc("/dashboard/logout", s.logout)
 
 	return s
 }
 
 func (s *server) index(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("index.html"))
-	if r.Method == http.MethodPost {
+	session, _ := store.Get(r, "cookie-name")
 
-		db := dbConn()
-		selDB, err := db.Query("SELECT * FROM users ORDER BY id DESC")
-		if err != nil {
-			panic(err.Error())
-		}
-		for selDB.Next() {
-			var id int
-			var username, email, phone, password string
-			err = selDB.Scan(&id, &username, &email,  &phone, &password)
-			http.Redirect(w, r, "/dashboard", 301)
+	tmpl := template.Must(template.ParseFiles("index.html"))
+	// Check if user is authenticated
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		if r.Method == http.MethodPost {
+			db := dbConn()
+			selDB, err := db.Query("SELECT * FROM users WHERE username = ? AND password = ? ", r.FormValue("username"), r.FormValue("password"))
 			if err != nil {
 				panic(err.Error())
 			}
+
+			for selDB.Next() {
+				var id int
+				var username, email, phone, password string
+				err = selDB.Scan(&id, &username, &email, &phone, &password)
+				// Set user as authenticated
+				session.Values["authenticated"] = true
+				session.Values["username"] = username
+				_ = session.Save(r, w)
+				http.Redirect(w, r, "/dashboard", 301)
+				if err != nil {
+					panic(err.Error())
+				}
+			}
+
+			log.Println("SELECTED")
+
+			defer db.Close()
+
 		}
 
-		log.Println("SELECTED")
-
-		defer db.Close()
-
+		_ = tmpl.Execute(w, nil)
+	} else {
+		http.Redirect(w, r, "/dashboard", 301)
 	}
-	tmpl.Execute(w, nil)
 }
 
 func (s *server) register(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
+
 	tmpl := template.Must(template.ParseFiles("register.html"))
-	if r.Method == http.MethodPost {
 
-		db := dbConn()
-		insForm, err := db.Prepare("INSERT INTO users(username, email, phone,  password) VALUES(?,?,?,?)")
-		if err != nil {
-			panic(err.Error())
+	// Check if user is authenticated
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		if r.Method == http.MethodPost {
+
+			db := dbConn()
+			insForm, err := db.Prepare("INSERT INTO users(username, email, phone,  password) VALUES(?,?,?,?)")
+			if err != nil {
+				panic(err.Error())
+			}
+
+			username := r.FormValue("username")
+			email := r.FormValue("email")
+			phone := r.FormValue("phone")
+			password := r.FormValue("password")
+
+			_, _ = insForm.Exec(username, email, phone, password)
+
+			log.Println("INSERTED")
+
+			defer db.Close()
+
+			http.Redirect(w, r, "/", 301)
+
 		}
-
-		username :=  r.FormValue("username")
-		email :=  r.FormValue("email")
-		phone :=  r.FormValue("phone")
-		password :=  r.FormValue("password")
-
-		insForm.Exec(username, email, phone, password)
-
-		log.Println("INSERTED")
-
-		defer db.Close()
-
-		http.Redirect(w, r, "/", 301)
-
+		_ = tmpl.Execute(w, nil)
+	} else {
+		http.Redirect(w, r, "/dashboard", 301)
 	}
-	tmpl.Execute(w, nil)
 }
 
 func (s *server) reset(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("reset.html"))
-	if r.Method == http.MethodPost {
+	//Get session
+	session, _ := store.Get(r, "cookie-name")
 
+	tmpl := template.Must(template.ParseFiles("reset.html"))
+
+	// Check if user is authenticated
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		if r.Method == http.MethodPost {
+
+		}
+		_ = tmpl.Execute(w, nil)
+	} else {
+		http.Redirect(w, r, "/dashboard", 301)
 	}
-	tmpl.Execute(w, nil)
 }
 
-func (s *server) dashboard(w http.ResponseWriter, r *http.Request,) {
+func (s *server) dashboard(w http.ResponseWriter, r *http.Request) {
+	//Get session
+	session, _ := store.Get(r, "cookie-name")
+
 	tmpl := template.Must(template.ParseFiles("dashboard.html"))
-	tmpl.Execute(w, struct{ Success bool }{true})
+
+	// Check if user is authenticated
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		http.Redirect(w, r, "/", 301)
+	} else {
+		type required struct {
+			Success  bool
+			Username interface{}
+		}
+
+		_ = tmpl.Execute(w, required{true, session.Values["username"]})
+	}
+}
+
+func (s *server) logout(w http.ResponseWriter, r *http.Request) {
+	//Get session
+	session, _ := store.Get(r, "cookie-name")
+
+	// Revoke users authentication
+	session.Values["authenticated"] = false
+	_ = session.Save(r, w)
+
+	http.Redirect(w, r, "/", 301)
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -171,4 +233,3 @@ func graceful(hs *http.Server, logger *log.Logger, timeout time.Duration) {
 		logger.Println("Server stopped")
 	}
 }
-
