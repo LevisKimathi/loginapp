@@ -1,5 +1,6 @@
 # loginapp
 Simple go lang project that demonstrates how to build a login, registration and reset
+
 Implements
 1. Graceful shutdown
 2. Templates
