@@ -51,9 +51,9 @@ func newServer(options ...func(*server)) *server {
 	}
 
 	s.mux.HandleFunc("/", s.index)
-	s.mux.HandleFunc("/register/", s.register)
-	s.mux.HandleFunc("/reset/", s.reset)
-	s.mux.HandleFunc("/dashboard/", s.dashboard)
+	s.mux.HandleFunc("/register", s.register)
+	s.mux.HandleFunc("/reset", s.reset)
+	s.mux.HandleFunc("/dashboard", s.dashboard)
 	s.mux.HandleFunc("/dashboard/logout", s.logout)
 
 	return s
