@@ -1,0 +1,55 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/LevisKimathi/loginapp",
+			"repository": "https://github.com/LevisKimathi/loginapp",
+			"vcs": "git",
+			"revision": "5d402ae9e7e31de2098a113f9ba8c1dd4a259934",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/go-sql-driver/mysql",
+			"repository": "https://github.com/go-sql-driver/mysql",
+			"vcs": "git",
+			"revision": "5a8a207333b3cbdd6f50a31da2d448658343637e",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gorilla/securecookie",
+			"repository": "https://github.com/gorilla/securecookie",
+			"vcs": "git",
+			"revision": "61b4ad17eb88d0d1118560d1101176279be2bc88",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gorilla/sessions",
+			"repository": "https://github.com/gorilla/sessions",
+			"vcs": "git",
+			"revision": "15ff3511704639ab26f7843f780c015f4bf49565",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/bcrypt",
+			"repository": "https://go.googlesource.com/crypto",
+			"vcs": "git",
+			"revision": "1d94cc7ab1c630336ab82ccb9c9cda72a875c382",
+			"branch": "master",
+			"path": "/bcrypt",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/crypto/blowfish",
+			"repository": "https://go.googlesource.com/crypto",
+			"vcs": "git",
+			"revision": "1d94cc7ab1c630336ab82ccb9c9cda72a875c382",
+			"branch": "master",
+			"path": "blowfish",
+			"notests": true
+		}
+	]
+}

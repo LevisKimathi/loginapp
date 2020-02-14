@@ -64,7 +64,7 @@ func (s *server) index(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
 	// Create template from html file
-	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl := template.Must(template.ParseFiles("index.html"))
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 		if r.Method == http.MethodPost {
@@ -117,7 +117,7 @@ func (s *server) register(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
 	// Create template from html file
-	tmpl := template.Must(template.ParseFiles("templates/register.html"))
+	tmpl := template.Must(template.ParseFiles("register.html"))
 
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
@@ -157,7 +157,7 @@ func (s *server) reset(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
 	// Create template from html file
-	tmpl := template.Must(template.ParseFiles("templates/reset.html"))
+	tmpl := template.Must(template.ParseFiles("reset.html"))
 
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
@@ -176,7 +176,7 @@ func (s *server) dashboard(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
 	// Create template from html file
-	tmpl := template.Must(template.ParseFiles("templates/dashboard.html"))
+	tmpl := template.Must(template.ParseFiles("dashboard.html"))
 
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
