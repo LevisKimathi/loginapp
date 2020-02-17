@@ -96,6 +96,7 @@ func (s *server) index(w http.ResponseWriter, r *http.Request) {
 					// Set user as authenticated
 					session.Values["authenticated"] = true
 					session.Values["username"] = username
+
 					_ = session.Save(r, w)
 					http.Redirect(w, r, "/dashboard", 301)
 
@@ -201,8 +202,6 @@ func (s *server) logout(w http.ResponseWriter, r *http.Request) {
 
 	// Delete all sessions
 	session.Options.MaxAge = -1
-	// Revoke users authentication
-	session.Values["authenticated"] = false
 	_ = session.Save(r, w)
 
 	// Redirect to default endpoint
