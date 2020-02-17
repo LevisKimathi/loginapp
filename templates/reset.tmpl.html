@@ -1,0 +1,28 @@
+{{template "header" .}}
+<body class="row  d-flex justify-content-center">
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <form id="reset_form" method="POST" >
+
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Email" required>
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+
+                <p>Not a member? <a href="https://sheltered-earth-42665.herokuapp.com/register">Sign Up Now</a></p>
+
+            </form>
+
+        </div>
+
+    </div>
+
+<body>
+
+{{template "footer" .}}

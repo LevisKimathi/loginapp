@@ -1,0 +1,8 @@
+{{template "header" .}}
+<body class="row  d-flex justify-content-center">
+<div>
+    {{if .Success}}
+        <p>Welcome {{.Username}} Status : Logged In <a href="https://sheltered-earth-42665.herokuapp.com/dashboard/logout">Logout</a></p>
+    {{end}}
+</div>
+{{template "footer" .}}

@@ -50,12 +50,16 @@ func newServer(options ...func(*server)) *server {
 		s.logger = log.New(os.Stdout, "", 0)
 	}
 
+	//Handle web routes
 	s.mux.HandleFunc("/", s.index)
 	s.mux.HandleFunc("/register", s.register)
 	s.mux.HandleFunc("/reset", s.reset)
 	s.mux.HandleFunc("/dashboard", s.dashboard)
 	s.mux.HandleFunc("/dashboard/logout", s.logout)
 
+	//Handle static server files such as images,css,js e.t.c
+	s.mux.Handle("/static/img/",
+		http.StripPrefix("/static/img/", http.FileServer(http.Dir("./static/img/"))))
 	return s
 }
 
@@ -64,7 +68,7 @@ func (s *server) index(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
 	// Create template from html file
-	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl := template.Must(template.ParseFiles("templates/index.tmpl.html", "templates/header.tmpl.html", "templates/footer.tmpl.html"))
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
 		if r.Method == http.MethodPost {
@@ -117,7 +121,7 @@ func (s *server) register(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
 	// Create template from html file
-	tmpl := template.Must(template.ParseFiles("templates/register.html"))
+	tmpl := template.Must(template.ParseFiles("templates/register.tmpl.html", "templates/header.tmpl.html", "templates/footer.tmpl.html"))
 
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
@@ -157,7 +161,7 @@ func (s *server) reset(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
 	// Create template from html file
-	tmpl := template.Must(template.ParseFiles("templates/reset.html"))
+	tmpl := template.Must(template.ParseFiles("templates/reset.tmpl.html", "templates/header.tmpl.html", "templates/footer.tmpl.html"))
 
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
@@ -176,7 +180,7 @@ func (s *server) dashboard(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "cookie-name")
 
 	// Create template from html file
-	tmpl := template.Must(template.ParseFiles("templates/dashboard.html"))
+	tmpl := template.Must(template.ParseFiles("templates/dashboard.tmpl.html", "templates/header.tmpl.html", "templates/footer.tmpl.html"))
 
 	// Check if user is authenticated
 	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
