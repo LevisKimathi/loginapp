@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 {{template "header" .}}
 <body class="row  d-flex justify-content-center">
 
@@ -5,11 +7,13 @@
 
         <div class="card-body">
 
-            <form id="register_form" method="POST" >
+            <form id="register_form" method="POST">
 
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" class="form-control" placeholder="Username" name="username" id="username" required>
+                    <div class="valid-feedback">Checks out.</div>
+                    <div class="invalid-feedback">Please fill out this field.</div>
                 </div>
 
                 <div class="form-group">
@@ -106,3 +110,5 @@
     }
 </script>
 {{template "footer" .}}
+</body>
+</html>
