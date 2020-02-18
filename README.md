@@ -38,6 +38,10 @@ func dbConn() (db *sql.DB) {
 ## Run
      Go run 'go run main.go' on your terminal in the project DIR
      Open your browser and move to the specified route http://127.0.0.1:8000
+# Todo
+     - [ ] Password Reset with email
+     - [ ] Dashboard
+     - [ ] Testing
 # Technologies Used
 
 Here's a list of technologies used in this project
