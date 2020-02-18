@@ -36,7 +36,7 @@ func dbConn() (db *sql.DB) {
     Open the .sql file in the database directory.
     Open your localhost and import the sql file into your database
 ## Run
-     go run main.go on your terminal in the project DIR
+     Go run 'go run main.go' on your terminal in the project DIR
      Open your browser and move to the specified route http://127.0.0.1:8000
 # Technologies Used
 
