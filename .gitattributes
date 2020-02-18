@@ -1,2 +1,3 @@
+# Ignore all other languages apart from go
 * linguist-vendored
 *.go linguist-vendored=false
