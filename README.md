@@ -50,4 +50,4 @@ Here's a list of technologies used in this project
   * [Golang version go1.13](https://golang.org/doc/go1.13)  
   * [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql)  
   * [gorilla/sessions](https://github.com/gorilla/sessions)  
-  * [crypto/bcrypt](https://golang.org/x/crypto/bcrypt)  
+  * [crypto/bcrypt](https://godoc.org/golang.org/x/crypto/bcrypt)  
